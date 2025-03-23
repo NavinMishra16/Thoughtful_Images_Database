@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Udit_Images</title>
+  <style>
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .image-item {
+      margin: 10px;
+    }
+    img {
+      max-width: 200px;
+      height: auto;
+      display: block;
+    }
+    .pagination {
+      margin: 20px;
+      text-align: center;
+    }
+    .pagination button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .pagination button.active {
+      font-weight: bold;
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Udit_Images</h1>
+  <div id="imageContainer" class="image-container"></div>
+  <div id="pagination" class="pagination"></div>
+
+  <script>
+    const imageUrls = [];
+    const totalImages = 5000; // Adjust to match your number of images
+    for (let i = 1; i <= totalImages; i++) {
+      imageUrls.push(`images/image${i}.jpg`); // Ensure your images follow this naming pattern
+    }
+
+    const imagesPerPage = 20;
+    let currentPage = 1;
+    const totalPages = Math.ceil(imageUrls.length / imagesPerPage);
+    const maxPageButtons = 5; // Maximum number of page buttons to show
+
+    // Function to load images for a specific page
+    function loadImages(page) {
+      const container = document.getElementById('imageContainer');
+      container.innerHTML = ''; // Clear the container before loading new images
+      const startIndex = (page - 1) * imagesPerPage;
+      const endIndex = Math.min(startIndex + imagesPerPage, imageUrls.length);
+
+      for (let i = startIndex; i < endIndex; i++) {
+        const imgDiv = document.createElement('div');
+        imgDiv.classList.add('image-item');
+        const img = document.createElement('img');
+        img.src = imageUrls[i];
+        img.alt = `Image ${i+1}`;
+        imgDiv.appendChild(img);
+        container.appendChild(imgDiv);
+      }
+    }
+
+    // Function to set up pagination with Prev/Next buttons
+    function setupPagination() {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = ''; // Clear previous buttons
+
+      // Create Previous button
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = 'Previous';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          loadImages(currentPage);
+          setupPagination();
+        }
+      });
+      pagination.appendChild(prevBtn);
+
+      // Determine the range of page numbers to display
+      let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+      let endPage = startPage + maxPageButtons - 1;
+      if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+      }
+
+      // Create page number buttons
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        if (i === currentPage) {
+          pageBtn.classList.add('active');
+        }
+        pageBtn.addEventListener('click', () => {
+          currentPage = i;
+          loadImages(currentPage);
+          setupPagination();
+        });
+        pagination.appendChild(pageBtn);
+      }
+
+      // Create Next button
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = 'Next';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadImages(currentPage);
+          setupPagination();
+        }
+      });
+      pagination.appendChild(nextBtn);
+    }
+
+    // Initial load
+    loadImages(currentPage);
+    setupPagination();
+  </script>
+</body>
+</html>
